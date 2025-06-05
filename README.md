@@ -1,3 +1,19 @@
+### 📚 Table of Contents
+
+* [Dataset Description](#dataset-description)
+* [Dataset Descriptions](#dataset-descriptions)
+
+  * [Public Training Datasets](#public-training-datasets)
+  * [Validation Datasets](#validation-datasets)
+  * [Testing Datasets](#testing-datasets)
+* [Data Structure and File Organization](#data-structure-and-file-organization)
+
+  * [Reference Contents](#reference-contents)
+* [Downloads](#downloads)
+* [Examples and Teasers](#examples-and-teasers)
+
+  * [Video Teasers](#video-teasers)
+
 # Datasets and Technical Details
 
 ## Dataset Description
@@ -8,7 +24,7 @@
 The datasets consist of multiple recorded loops and calibration sequences intended for evaluation and training of sensor-based localization and mapping.
 They were recorded outdoors in challenging localization conditions.
 The datasets include LiDAR, GNSS, multiple cameras (RGB, thermal), and IMUs.
-**NIR and NDVI are from the Agiception camera.**
+**NIR and NDVI are provided by the Agiception camera.**
 
 ---
 
@@ -16,61 +32,79 @@ The datasets include LiDAR, GNSS, multiple cameras (RGB, thermal), and IMUs.
 
 ### Public Training Datasets
 
-1. **shellby-0225-train-loop1** (451 m)
-   A slightly larger loop in an open field used for training, moving further from trees.
+* **shellby-0225-train-loop1** (451 m)
+  Loop in an open field used for training, moving further from trees.
 
-2. **shellby-0225-train-lab**
-   A short recording taken in the **Computational Robotics Lab, CTU in Prague** after the experiments for initial testing purposes.
-   **Total Station measurements are used as a reference instead of GNSS.**
+* **shellby-0225-train-lab**
+  Short indoor recording from **CTU Computational Robotics Lab** for initial testing.
+  Uses **Total Station** instead of GNSS.
 
-### Validation Datasets (Submission-enabled)
+### Validation Datasets
 
-1. **shellby-0225-validation-loop1** (313 m)
-   A small loop primarily for testing submissions. The **forest stays in the range of the 3D LiDAR**.
+* **shellby-0225-validation-loop1** (313 m)
+  Small loop primarily for testing submissions. The **forest remains in LiDAR range**.
 
-### Testing Datasets (Final Evaluation)
+### Testing Datasets
 
-1. **shellby-0225-test-loop1** (1892 m)
-   A large loop containing both field and forest environments.
-   Notably, there is a **30-second LiDAR outage** due to a power loss.
+* **shellby-0225-test-loop1** (1892 m)
+  Long loop with both field and forest. Includes a **30-second LiDAR outage** due to power loss.
 
-2. **shellby-0225-test-loop2** (667 m)
-   A loop similar to **shellby-0225-train-loop1** but with a **less smooth trajectory**.
-   **Total Station measurements are recorded and will be used for evaluation.**
-   The Basler camera is slightly overexposed but still usable.
+* **shellby-0225-test-loop2** (667 m)
+  Similar to the training loop but with **less smooth trajectory**.
+  Evaluated using **Total Station** data. Basler camera slightly overexposed.
 
 ---
 
 ## Data Structure and File Organization
 
 ```
-├── data
-│   ├── train
-│   │   ├── extrinsics
-│   │   │   ├── extrinsics.txt
-│   │   │   ├── static_tf.launch
-│   │   │   ├── static_tf.urdf
-│   │   ├── <train-sequence-1>
-│   │   │   ├── reference
-│   │   │   │   ├── <train-sequence-1>.csv
-│   │   │   ├── <train-sequence-1>.bag
-│   │   ├── <train-sequence-2>/
+data/
+├── calibration
+│   ├── extrinsics
+│   │   ├── extrinsics.txt
+│   │   ├── static_tf.launch
+│   │   └── static_tf.urdf
+│   └── instrinsics
+│       ├── basler.yaml
+│       ├── flir_boson.yaml
+│       ├── plantpix1.yaml
+│       └── plantpix2.yaml
+├── train
+│   ├── calibration
+│   ├── shellby-0225-train-lab
+│   │   ├── reference
+│   │   │   ├── shellby-0225-train-lab.txt
+│   │   │   └── shellby-0225-train-lab_noisy.txt
+│   │   └── shellby-0225-train-lab.bag
+│   └── shellby-0225-train-loop1
+├── validation
+│   ├── calibration
+│   └── shellby-0225-validation-loop1
+├── test/...
 ```
 
-* **<sequence>.bag** → Raw sensory data recorded from the **NUC**.
-* **<sequence>.csv** → Reference trajectory in **TUM text format**, no orientation: `x y z qw qx qy qz`.
-* [**extrinsics.txt**](https://comrob-ds.fel.cvut.cz:9000/cb-slam/data/train/extrinsics/extrinsics.txt) → Extrinsic calibration data for sensor transformations.
-* **static\_tf.launch** → ROS launch file defining static transforms.
-* **static\_tf.urdf** → URDF file describing the fixed transformations.
+* `<sequence>.bag` → Raw sensory data.
+* `reference/` → Folder containing reference trajectories.
+* `calibration/extrinsics/` → Transformations between sensor frames.
+* `calibration/instrinsics/` → Intrinsic parameters for cameras.
+* `static_tf.launch` → ROS static transform launch file.
+* `static_tf.urdf` → URDF for static transform definitions.
+
+### Reference Contents
+
+Each dataset contains a `reference/` subdirectory with:
+
+* `*.txt`: Ground-truth trajectory (TUM or Total Station format).
+* `*_noisy.txt`: Unfiltered GNSS trajectory (may be degraded by environment).
 
 ---
 
 ## Downloads
 
-* [All training data](https://comrob-ds.fel.cvut.cz:9001/api/v1/buckets/cb-slam/objects/download?prefix=data/train/) (52 GB, about 27 GB for download)
+* [All training data](https://comrob-ds.fel.cvut.cz:9001/api/v1/buckets/cb-slam/objects/download?prefix=data/train/) (52 GB, \~27 GB download)
 * [extrinsics](https://comrob-ds.fel.cvut.cz:9001/api/v1/buckets/cb-slam/objects/download?prefix=data/train/extrinsics/) (16 kB)
-* [shellby-0225-train-lab](https://comrob-ds.fel.cvut.cz:9001/api/v1/buckets/cb-slam/objects/download?prefix=data/train/shellby-0225-train-lab/) (5.5 GB, about 3.3 GB for download)
-* [shellby-0225-train-loop1](https://comrob-ds.fel.cvut.cz:9001/api/v1/buckets/cb-slam/objects/download?prefix=data/train/shellby-0225-train-loop1/) (47 GB, about 24 GB for download)
+* [shellby-0225-train-lab](https://comrob-ds.fel.cvut.cz:9001/api/v1/buckets/cb-slam/objects/download?prefix=data/train/shellby-0225-train-lab/) (5.5 GB, \~3.3 GB download)
+* [shellby-0225-train-loop1](https://comrob-ds.fel.cvut.cz:9001/api/v1/buckets/cb-slam/objects/download?prefix=data/train/shellby-0225-train-loop1/) (47 GB, \~24 GB download)
 
 ---
 
@@ -86,7 +120,7 @@ The datasets include LiDAR, GNSS, multiple cameras (RGB, thermal), and IMUs.
 ![location8](https://comrob-ds.fel.cvut.cz:9000/cb-slam/media/images/location8.jpeg)
 ![location9](https://comrob-ds.fel.cvut.cz:9000/cb-slam/media/images/location9.jpeg)
 
-*Example of locations where the datasets were collected.*
+*Example environments where data was collected.*
 
 ### Video Teasers
 
